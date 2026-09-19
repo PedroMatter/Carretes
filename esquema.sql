@@ -18,6 +18,15 @@ CREATE TABLE IF NOT EXISTS producto (
     UNIQUE (pelicula_id, formato, exposiciones)
 );
 
+-- UNIQUE (pelicula_id, formato, exposiciones) de arriba no basta: SQLite
+-- trata cada NULL como distinto de los demás, así que dos filas del mismo
+-- carrete en 120 (sin exposiciones) no chocarían. Este índice sí las
+-- protege, tratando el NULL como un valor más (-1, que no es un número de
+-- exposiciones real). Vive en la base de datos para que ningún script,
+-- presente o futuro, pueda saltárselo por accidente.
+CREATE UNIQUE INDEX IF NOT EXISTS producto_unico
+    ON producto (pelicula_id, formato, COALESCE(exposiciones, -1));
+
 -- id_externo es el identificador que da la propia tienda (id de producto,
 -- o de variación si algún día una tienda las usa de verdad). Es lo que
 -- identifica un anuncio de forma estable entre una pasada del recolector
@@ -42,17 +51,29 @@ CREATE TABLE IF NOT EXISTS observacion (
     capturado_en    TEXT NOT NULL
 );
 
+-- La consulta más habitual será "último precio de este anuncio": sin este
+-- índice, cada consulta recorrería toda la tabla, y esta es la que más
+-- crece de todas (una fila por anuncio en cada pasada de cada tienda).
+CREATE INDEX IF NOT EXISTS observacion_anuncio_fecha
+    ON observacion (anuncio_id, capturado_en);
+
 -- Todavía no hay emparejamiento automático (ver CLAUDE.md, sección "El
 -- emparejamiento"): todo anuncio nuevo de una tienda va aquí hasta que un
 -- humano decida a qué producto corresponde, o que no es un carrete.
 -- UNIQUE (tienda, nombre_original) para que un mismo anuncio sin resolver
 -- no se repita en la cola cada vez que se ejecuta el recolector.
+-- Lleva id_externo y unidades_por_pack porque hacen falta para dar de alta
+-- el anuncio en el momento de resolver la fila, sin tener que volver a
+-- pedirle el producto a la tienda. unidades_por_pack puede ser NULL: es el
+-- caso en que ni siquiera eso se pudo determinar con seguridad.
 CREATE TABLE IF NOT EXISTS cola_revision (
     id                INTEGER PRIMARY KEY,
     tienda            TEXT NOT NULL,
+    id_externo        TEXT NOT NULL,
     nombre_original   TEXT NOT NULL,
     url               TEXT NOT NULL,
     formato           TEXT,
+    unidades_por_pack INTEGER,
     descripcion_cruda TEXT NOT NULL,
     motivo            TEXT NOT NULL,
     visto_en          TEXT NOT NULL,
