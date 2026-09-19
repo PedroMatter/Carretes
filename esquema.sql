@@ -126,3 +126,12 @@ CREATE TABLE IF NOT EXISTS clic_saliente (
     anuncio_id  INTEGER NOT NULL REFERENCES anuncio(id),
     clicado_en  TEXT NOT NULL
 );
+
+-- Registro de qué migraciones de migraciones/ se han aplicado ya a esta
+-- base de datos concreta, para no aplicar la misma dos veces y para poder
+-- saber, meses después, en qué punto está cada copia.
+CREATE TABLE IF NOT EXISTS migracion_aplicada (
+    id          INTEGER PRIMARY KEY,
+    nombre      TEXT NOT NULL UNIQUE,
+    aplicada_en TEXT NOT NULL
+);

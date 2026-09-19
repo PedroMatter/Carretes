@@ -12,3 +12,7 @@ __pycache__/
 
 # Base de datos: contiene datos reales y no debe estar en un repo público.
 carretes.db
+
+# Copias de seguridad que hace aplicar_migracion.py antes de tocar nada:
+# mismo motivo que carretes.db.
+respaldos/

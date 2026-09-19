@@ -7,4 +7,6 @@
 -- recolector que dejara de guardar nada tenía que seguir pareciendo sano
 -- con este error.
 
+BEGIN;
 ALTER TABLE ejecucion ADD COLUMN candidatos_vistos INTEGER;
+COMMIT;
