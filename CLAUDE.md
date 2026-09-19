@@ -136,22 +136,71 @@ desconocidos hasta confirmarlos.
 
 ## Stack
 
-Python. FastAPI sirviendo HTML con plantillas ahora y JSON después (la misma
-aplicación, que es lo que se quiere para la API más adelante). SQLite de
-entrada, con el esquema pensado para migrar a Postgres sin drama. Los
-recolectores como job programado aparte, nunca dentro de la web.
+Todo gratis y todo desde GitHub:
 
-HTML renderizado en servidor y el mínimo JavaScript. Nada de SPA.
+- **Repo público en GitHub.** Público a propósito: los workflows programados de
+  GitHub Actions no se disparan en repos privados con plan gratuito. Y aquí no
+  hay nada secreto.
+- **Streamlit Community Cloud** para la web. Despliega solo desde GitHub.
+- **GitHub Actions** para ejecutar los recolectores en horario y guardar los
+  precios en el propio repo.
+- **SQLite** de entrada, con el esquema pensado para migrar a Postgres sin
+  drama.
 
-El optimizador ya está escrito y probado: MILP con PuLP sobre CBC, verificado
-contra fuerza bruta. Hay que portarlo y añadirle los packs.
+**La regla de arquitectura que no se rompe:** toda la lógica va en módulos de
+Python normales que no saben nada de Streamlit. Streamlit es sólo una capa fina
+que llama a esas funciones y pinta el resultado.
+
+Motivo: Streamlit es el andamio, no la casa. El día que haya dominio propio,
+diseño en condiciones y una API, se cambia la capa de arriba y el motor no se
+toca. Sin esta regla, la lógica se mezcla con la interfaz y hay que reescribir
+todo.
+
+El optimizador ya está escrito y probado fuera de este repo: MILP con PuLP
+sobre CBC, verificado contra fuerza bruta. Hay que portarlo y añadirle los
+packs.
+
+---
+
+## Ideas para más adelante
+
+Nada de esto está decidido. Son cosas a evaluar cuando toque el paso
+correspondiente, no antes.
+
+- **Jev, de TypeSafe AI**, para el paso 3 (emparejamiento automático de
+  anuncios con productos canónicos). Devuelve decisiones sobre un conjunto
+  cerrado de opciones con confianza calibrada, lo que encajaría bien con la
+  cola de revisión del principio 2: confianza alta se empareja solo, confianza
+  baja va a la cola. Pero no se usa antes de tener el emparejamiento manual
+  funcionando — sin eso no hay con qué medir si sus decisiones son fiables.
 
 ---
 
 ## Cómo trabajar en este repo
 
-Ir despacio y hacer una cosa a la vez. Antes de añadir una función, preguntar
-si hace falta ahora. Es un proyecto de una persona que además tiene otro
-trabajo: el enemigo es la complejidad acumulada, no la falta de funciones.
+**Quién hay al otro lado.** Pedro nunca ha programado. Está aprendiendo con
+este proyecto y quiere aprender de verdad, no que le entreguen una caja negra.
+Esto no es una limitación que haya que sortear: es el objetivo.
 
-Preferir aburrido y correcto sobre listo y frágil.
+Lo que significa en la práctica:
+
+- **Una cosa cada vez.** Nunca varios ficheros nuevos de golpe. Un paso, que
+  funcione, que él lo vea funcionar, y entonces el siguiente.
+- **Explicar antes de escribir.** Qué vas a hacer y por qué, en castellano
+  llano, antes de tocar nada. Si un concepto es nuevo, explicarlo cuando
+  aparece, no darlo por sabido.
+- **Nada de jerga sin traducir.** La primera vez que salga un término
+  (migración, endpoint, dependencia, entorno virtual), explicarlo en una línea.
+- **Comentar el código de verdad**, pensando en alguien que lo lee para
+  entenderlo, no para recordarlo.
+- **Después de cada paso, decirle cómo comprobar que funciona.** El comando
+  exacto y qué debería ver en pantalla.
+- **Si algo falla, explicar por qué falló**, no sólo arreglarlo. El error es la
+  clase.
+- Es Windows, con PowerShell. Los comandos tienen que ser de Windows.
+
+**No adelantar pasos.** Si pide el esquema, sólo el esquema. Si empiezas a
+montar de más, te va a parar, y tiene razón.
+
+Preferir aburrido y correcto sobre listo y frágil. El enemigo de este proyecto
+es la complejidad acumulada, no la falta de funciones.
