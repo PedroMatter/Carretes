@@ -42,11 +42,14 @@ CREATE TABLE IF NOT EXISTS anuncio (
 );
 
 -- El precio se guarda en céntimos enteros, tal como lo da la tienda, para
--- no arrastrar errores de redondeo de coma flotante.
+-- no arrastrar errores de redondeo de coma flotante. precio_centimos admite
+-- NULL: es lo que lleva la observación que registra que un anuncio dejó de
+-- verse (disponible = 0) — ahí no hay ningún precio observado de verdad, y
+-- rellenarlo con el último conocido sería inventar un dato.
 CREATE TABLE IF NOT EXISTS observacion (
     id              INTEGER PRIMARY KEY,
     anuncio_id      INTEGER NOT NULL REFERENCES anuncio(id),
-    precio_centimos INTEGER NOT NULL,
+    precio_centimos INTEGER,
     disponible      INTEGER NOT NULL,
     capturado_en    TEXT NOT NULL
 );
@@ -94,14 +97,18 @@ CREATE TABLE IF NOT EXISTS equivalencia (
 
 -- Un registro por cada vez que se ejecuta un recolector, para poder
 -- distinguir "no hay precios nuevos porque nada ha cambiado" de "el
--- recolector lleva tres semanas fallando en silencio".
+-- recolector lleva tres semanas fallando en silencio". candidatos_vistos
+-- (cuántos trajo la tienda) y anuncios_vistos (cuántos acabaron con
+-- observación guardada) van por separado: si se mezclaran, un recolector
+-- que dejara de guardar nada seguiría pareciendo sano.
 CREATE TABLE IF NOT EXISTS ejecucion (
-    id              INTEGER PRIMARY KEY,
-    tienda          TEXT NOT NULL,
-    iniciada_en     TEXT NOT NULL,
-    finalizada_en   TEXT,
-    anuncios_vistos INTEGER,
-    error           TEXT
+    id                INTEGER PRIMARY KEY,
+    tienda            TEXT NOT NULL,
+    iniciada_en       TEXT NOT NULL,
+    finalizada_en     TEXT,
+    candidatos_vistos INTEGER,
+    anuncios_vistos   INTEGER,
+    error             TEXT
 );
 
 -- Anónimas a propósito: ni usuario ni IP. Se guardan desde ya aunque no se

@@ -51,16 +51,27 @@ def imprimir_candidatos(candidatos):
 
 def _obtener_o_crear_anuncio(conexion, tienda, candidato, producto_id):
     fila = conexion.execute(
-        "SELECT id FROM anuncio WHERE tienda = ? AND id_externo = ?",
+        "SELECT id, unidades_por_pack FROM anuncio WHERE tienda = ? AND id_externo = ?",
         (tienda, candidato.id_externo),
     ).fetchone()
 
     if fila is not None:
+        anuncio_id, unidades_anteriores = fila
+        if unidades_anteriores != candidato.unidades_por_pack:
+            # De momento solo avisar, no decidir nada: si esto no pasa nunca
+            # en unos meses, se deja así; si pasa, se piensa con el caso
+            # real delante (el histórico de precio-por-unidad de este
+            # anuncio queda mezclado entre el valor viejo y el nuevo).
+            print(
+                f"AVISO: {tienda} {candidato.id_externo} ({candidato.nombre_original}) "
+                f"cambia unidades_por_pack de {unidades_anteriores} a "
+                f"{candidato.unidades_por_pack}"
+            )
         conexion.execute(
             "UPDATE anuncio SET unidades_por_pack = ?, url = ? WHERE id = ?",
-            (candidato.unidades_por_pack, candidato.url, fila[0]),
+            (candidato.unidades_por_pack, candidato.url, anuncio_id),
         )
-        return fila[0]
+        return anuncio_id
 
     cursor = conexion.execute(
         """
@@ -73,27 +84,43 @@ def _obtener_o_crear_anuncio(conexion, tienda, candidato, producto_id):
 
 
 def _marcar_desaparecidos(conexion, tienda, vistos_id_externo, ahora):
-    desaparecidos = 0
+    """Para cada anuncio de la tienda que no apareció en esta pasada, si su
+    última observación conocida decía disponible=1, añade una observación
+    con disponible=0 y precio_centimos=NULL — no se ha observado ningún
+    precio, solo el hecho de que hoy no está.
+
+    No repite la fila en cada pasada siguiente (solo escribe en la
+    transición de "estaba" a "ya no está"), y un anuncio sin ninguna
+    observación previa no genera nada: no hay "dejar de ver" que registrar.
+    """
+    marcados = 0
     for anuncio_id, id_externo in conexion.execute(
         "SELECT id, id_externo FROM anuncio WHERE tienda = ?", (tienda,)
     ):
         if id_externo in vistos_id_externo:
             continue
+
+        ultima = conexion.execute(
+            """
+            SELECT disponible FROM observacion
+            WHERE anuncio_id = ?
+            ORDER BY capturado_en DESC LIMIT 1
+            """,
+            (anuncio_id,),
+        ).fetchone()
+
+        if ultima is None or ultima[0] == 0:
+            continue
+
         conexion.execute(
             """
             INSERT INTO observacion (anuncio_id, precio_centimos, disponible, capturado_en)
-            VALUES (
-                ?,
-                (SELECT precio_centimos FROM observacion
-                 WHERE anuncio_id = ? ORDER BY capturado_en DESC LIMIT 1),
-                0,
-                ?
-            )
+            VALUES (?, NULL, 0, ?)
             """,
-            (anuncio_id, anuncio_id, ahora),
+            (anuncio_id, ahora),
         )
-        desaparecidos += 1
-    return desaparecidos
+        marcados += 1
+    return marcados
 
 
 def guardar(tienda_modulo):
@@ -107,13 +134,16 @@ def guardar(tienda_modulo):
     ).lastrowid
     conexion.commit()
 
+    candidatos_vistos = None
+    anuncios_con_observacion = 0
+
     try:
         candidatos, diagnostico = tienda_modulo.recolectar()
         informar(candidatos, diagnostico)
+        candidatos_vistos = diagnostico["candidatos"]
 
         vistos_id_externo = set()
         cola_creadas = 0
-        anuncios_con_observacion = 0
 
         for candidato in candidatos:
             resultado = emparejar.resolver(conexion, tienda, candidato.nombre_original)
@@ -161,10 +191,16 @@ def guardar(tienda_modulo):
         conexion.commit()
         conexion.execute(
             """
-            UPDATE ejecucion SET finalizada_en = ?, anuncios_vistos = ?, error = NULL
+            UPDATE ejecucion
+            SET finalizada_en = ?, candidatos_vistos = ?, anuncios_vistos = ?, error = NULL
             WHERE id = ?
             """,
-            (datetime.now(timezone.utc).isoformat(), diagnostico["candidatos"], id_ejecucion),
+            (
+                datetime.now(timezone.utc).isoformat(),
+                candidatos_vistos,
+                anuncios_con_observacion,
+                id_ejecucion,
+            ),
         )
         conexion.commit()
 
@@ -176,9 +212,22 @@ def guardar(tienda_modulo):
 
     except Exception as error:
         conexion.rollback()
+        # anuncios_con_observacion no se guarda aquí: el rollback deshace
+        # cualquier anuncio/observación de esta pasada, así que lo único
+        # honesto es 0 (nada quedó guardado), aunque el bucle hubiera
+        # llegado más lejos antes de fallar.
         conexion.execute(
-            "UPDATE ejecucion SET finalizada_en = ?, error = ? WHERE id = ?",
-            (datetime.now(timezone.utc).isoformat(), str(error), id_ejecucion),
+            """
+            UPDATE ejecucion
+            SET finalizada_en = ?, candidatos_vistos = ?, anuncios_vistos = 0, error = ?
+            WHERE id = ?
+            """,
+            (
+                datetime.now(timezone.utc).isoformat(),
+                candidatos_vistos,
+                str(error),
+                id_ejecucion,
+            ),
         )
         conexion.commit()
         raise
