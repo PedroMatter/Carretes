@@ -10,17 +10,12 @@ base de datos, no lo vuelve a insertar.
 """
 
 import csv
-import sqlite3
 from pathlib import Path
 
+import db
+
 RAIZ = Path(__file__).parent
-BASE_DE_DATOS = RAIZ / "carretes.db"
-ESQUEMA = RAIZ / "esquema.sql"
 CATALOGO = RAIZ / "catalogo.csv"
-
-
-def crear_esquema(conexion):
-    conexion.executescript(ESQUEMA.read_text(encoding="utf-8"))
 
 
 def obtener_o_crear_pelicula(conexion, marca, nombre, iso, proceso):
@@ -56,8 +51,7 @@ def producto_ya_existe(conexion, pelicula_id, formato, exposiciones):
 
 
 def cargar_catalogo():
-    conexion = sqlite3.connect(BASE_DE_DATOS)
-    crear_esquema(conexion)
+    conexion = db.conectar()
 
     peliculas_nuevas = 0
     productos_nuevos = 0
