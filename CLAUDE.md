@@ -1,4 +1,4 @@
-# carretes.es
+# correcarrete
 
 Comparador de precios de película fotográfica para España. Le dices qué
 carretes quieres y cuántos, y te dice **en qué combinación de tiendas sale más
