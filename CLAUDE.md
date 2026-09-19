@@ -166,17 +166,52 @@ packs.
 
 ---
 
-## Ideas para más adelante
+## El emparejamiento: dos candidatos, sin decidir
 
-Nada de esto está decidido. Son cosas a evaluar cuando toque el paso
-correspondiente, no antes.
+La decisión se toma con números medidos sobre nuestros datos, no antes.
 
-- **Jev, de TypeSafe AI**, para el paso 3 (emparejamiento automático de
-  anuncios con productos canónicos). Devuelve decisiones sobre un conjunto
-  cerrado de opciones con confianza calibrada, lo que encajaría bien con la
-  cola de revisión del principio 2: confianza alta se empareja solo, confianza
-  baja va a la cola. Pero no se usa antes de tener el emparejamiento manual
-  funcionando — sin eso no hay con qué medir si sus decisiones son fiables.
+**Jev (TypeSafe AI).** No es un LLM: devuelve una opción de un conjunto
+cerrado con probabilidad calibrada, en 70-500 ms y a unos 0,0004 $ por
+decisión. Sus ventajas son el volumen, la latencia y que el número de
+confianza es fiable de verdad — está entrenado para que sus probabilidades
+cuadren con los resultados, cosa que en un LLM no ocurre. Sus inconvenientes:
+en el banco de pruebas del propio fabricante saca 67,8% de acierto frente al
+73,1% de Claude Opus 5 y el 74,1% del mejor GPT; admite un máximo de 255
+opciones, y hoy hay 84 productos pero el catálogo crece; y salió en
+septiembre de 2026, o sea que la API puede cambiar.
+
+**Un LLM con calibración medida.** Más acierto hoy. La confianza no viene
+calibrada de fábrica, pero se calibra midiendo contra los emparejamientos
+hechos a mano.
+
+A nuestra escala — unos 120 emparejamientos por tienda, una sola vez, que
+quedan guardados en `equivalencia` y no se repiten — el precio y la latencia
+de Jev no aportan nada. Lo que importa es el acierto, y ahí va por detrás.
+Ese cálculo solo cambiaría con fuentes donde cada anuncio es único y no se
+repite nunca.
+
+**Lo que no cambia.** Ninguno de los dos deroga el principio 2. «No alucina»
+significa que Jev siempre devolverá un producto del catálogo y nunca un
+formato inválido. No significa que no se equivoque: el propio fabricante
+reconoce que puede estar seguro y equivocado, y la calibración se mide sobre
+grupos de respuestas, no sobre una respuesta concreta. La cola de revisión se
+queda.
+
+**Cómo se decide.** Emparejar a mano las dos primeras tiendas y usar esos
+emparejamientos como patrón contra el que medir a los dos candidatos. El
+umbral de confianza sale de esa medición y de ningún otro sitio.
+
+**Cómo será el trabajo manual.** Vaciar la cola no es mirar nombres en
+blanco: el script de resolución preparará una propuesta por fila, y el
+humano firma o corrige. Se presenta con el nombre original de la tienda al
+lado del producto propuesto, ordenado por riesgo — primero las dudosas y las
+que no ha sabido emparejar, al final las obvias — y por bloques, no las 120
+de una sentada. La fatiga de revisión es el riesgo real de este método.
+
+**Dónde sí encaja Jev con claridad.** En el filtro previo, «¿esto es un
+carrete, sí o no?», sobre cientos de productos por tienda y pasada. Pregunta
+binaria, repetida, a volumen, sobre un espacio cerrado. Ese es su perfil, y
+no el emparejamiento.
 
 ---
 
