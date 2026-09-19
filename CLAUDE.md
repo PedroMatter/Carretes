@@ -99,6 +99,10 @@ claramente que no tenemos sus precios, en vez de fingir que sí.
 
 ## Orden de construcción
 
+0. **Despliegue mínimo.** Una app de Streamlit vacía, desplegada en Streamlit
+   Community Cloud desde este repo. Treinta minutos, y hace que todo lo que
+   venga después nazca ya publicado en vez de acumularse sin desplegar.
+   *Hecho cuando la URL pública carga sin errores.*
 1. **Esquema y catálogo canónico.** Sembrar a mano los 40-50 stocks que
    importan en España, en sus formatos. Se hace a mano y con cuidado.
 2. **Una tienda de punta a punta.** Traer, parsear, emparejar, guardar
@@ -106,7 +110,7 @@ claramente que no tenemos sus precios, en vez de fingir que sí.
 3. **La segunda tienda**, que es cuando aparecen los problemas de
    emparejamiento de verdad. *Hecho cuando añadir la tercera cuesta una hora.*
 4. **El optimizador** de cesta con packs y umbrales.
-5. **La web.**
+5. **La web de verdad**, construida encima del despliegue mínimo del paso 0.
 6. **Frescura y avisos** cuando un adaptador se rompe.
 7. **Más tiendas.**
 
