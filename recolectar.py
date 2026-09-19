@@ -49,27 +49,35 @@ def imprimir_candidatos(candidatos):
         )
 
 
-def _obtener_o_crear_anuncio(conexion, tienda, candidato, producto_id):
+def obtener_o_crear_anuncio(
+    conexion, tienda, id_externo, url, unidades_por_pack, producto_id, nombre_original=""
+):
+    """Reutilizada por resolver_cola.py: dar de alta un anuncio no depende
+    de tener un AnuncioCrudo fresco de la tienda, solo de estos datos.
+    """
     fila = conexion.execute(
-        "SELECT id, unidades_por_pack FROM anuncio WHERE tienda = ? AND id_externo = ?",
-        (tienda, candidato.id_externo),
+        "SELECT id, producto_id, unidades_por_pack FROM anuncio WHERE tienda = ? AND id_externo = ?",
+        (tienda, id_externo),
     ).fetchone()
 
     if fila is not None:
-        anuncio_id, unidades_anteriores = fila
-        if unidades_anteriores != candidato.unidades_por_pack:
-            # De momento solo avisar, no decidir nada: si esto no pasa nunca
-            # en unos meses, se deja así; si pasa, se piensa con el caso
-            # real delante (el histórico de precio-por-unidad de este
-            # anuncio queda mezclado entre el valor viejo y el nuevo).
+        anuncio_id, producto_anterior, unidades_anteriores = fila
+        # Solo avisar, no decidir nada por su cuenta: si esto no pasa nunca
+        # en unos meses, se deja así; si pasa, se piensa con el caso real
+        # delante.
+        if producto_anterior != producto_id:
             print(
-                f"AVISO: {tienda} {candidato.id_externo} ({candidato.nombre_original}) "
-                f"cambia unidades_por_pack de {unidades_anteriores} a "
-                f"{candidato.unidades_por_pack}"
+                f"AVISO: {tienda} {id_externo} ({nombre_original}) cambia de "
+                f"producto_id {producto_anterior} a {producto_id}"
+            )
+        if unidades_anteriores != unidades_por_pack:
+            print(
+                f"AVISO: {tienda} {id_externo} ({nombre_original}) cambia "
+                f"unidades_por_pack de {unidades_anteriores} a {unidades_por_pack}"
             )
         conexion.execute(
-            "UPDATE anuncio SET unidades_por_pack = ?, url = ? WHERE id = ?",
-            (candidato.unidades_por_pack, candidato.url, anuncio_id),
+            "UPDATE anuncio SET producto_id = ?, unidades_por_pack = ?, url = ? WHERE id = ?",
+            (producto_id, unidades_por_pack, url, anuncio_id),
         )
         return anuncio_id
 
@@ -78,7 +86,7 @@ def _obtener_o_crear_anuncio(conexion, tienda, candidato, producto_id):
         INSERT INTO anuncio (producto_id, tienda, id_externo, unidades_por_pack, url)
         VALUES (?, ?, ?, ?, ?)
         """,
-        (producto_id, tienda, candidato.id_externo, candidato.unidades_por_pack, candidato.url),
+        (producto_id, tienda, id_externo, unidades_por_pack, url),
     )
     return cursor.lastrowid
 
@@ -175,7 +183,15 @@ def guardar(tienda_modulo):
                 continue
 
             producto_id = resultado
-            anuncio_id = _obtener_o_crear_anuncio(conexion, tienda, candidato, producto_id)
+            anuncio_id = obtener_o_crear_anuncio(
+                conexion,
+                tienda,
+                candidato.id_externo,
+                candidato.url,
+                candidato.unidades_por_pack,
+                producto_id,
+                candidato.nombre_original,
+            )
             vistos_id_externo.add(candidato.id_externo)
             conexion.execute(
                 """
