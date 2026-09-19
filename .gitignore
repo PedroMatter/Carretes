@@ -1,1 +1,14 @@
 diag.txt
+
+# Entorno virtual: la carpeta donde Python guarda las librerías instaladas
+# para este proyecto. Se reconstruye con requirements.txt, no hace falta
+# subirla.
+.venv/
+venv/
+env/
+
+# Caché de Python compilado, se regenera solo.
+__pycache__/
+
+# Base de datos: contiene datos reales y no debe estar en un repo público.
+carretes.db

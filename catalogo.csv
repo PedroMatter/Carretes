@@ -1,0 +1,85 @@
+marca,nombre,iso,proceso,formato,exposiciones
+Kodak,Portra 160,160,C-41,35mm,36
+Kodak,Portra 160,160,C-41,120,
+Kodak,Portra 400,400,C-41,35mm,36
+Kodak,Portra 400,400,C-41,120,
+Kodak,Portra 800,800,C-41,35mm,36
+Kodak,Portra 800,800,C-41,120,
+Kodak,Ektar 100,100,C-41,35mm,36
+Kodak,Ektar 100,100,C-41,120,
+Kodak,Gold 200,200,C-41,35mm,36
+Kodak,Gold 200,200,C-41,35mm,24
+Kodak,Gold 200,200,C-41,120,
+Kodak,ColorPlus 200,200,C-41,35mm,36
+Kodak,ColorPlus 200,200,C-41,35mm,24
+Kodak,Ultramax 400,400,C-41,35mm,36
+Kodak,Ultramax 400,400,C-41,35mm,24
+Kodak,Pro Image 100,100,C-41,35mm,36
+Kodak,Tri-X 400,400,B&N,35mm,36
+Kodak,Tri-X 400,400,B&N,120,
+Kodak,T-Max 100,100,B&N,35mm,36
+Kodak,T-Max 100,100,B&N,120,
+Kodak,T-Max 400,400,B&N,35mm,36
+Kodak,T-Max 400,400,B&N,120,
+Kodak,Ektachrome E100,100,E-6,35mm,36
+Kodak,Ektachrome E100,100,E-6,120,
+Ilford,HP5 Plus,400,B&N,35mm,36
+Ilford,HP5 Plus,400,B&N,120,
+Ilford,FP4 Plus,125,B&N,35mm,36
+Ilford,FP4 Plus,125,B&N,120,
+Ilford,Delta 100,100,B&N,35mm,36
+Ilford,Delta 100,100,B&N,120,
+Ilford,Delta 400,400,B&N,35mm,36
+Ilford,Delta 400,400,B&N,120,
+Ilford,Delta 3200,3200,B&N,35mm,36
+Ilford,Delta 3200,3200,B&N,120,
+Ilford,Pan F Plus,50,B&N,35mm,36
+Ilford,Pan F Plus,50,B&N,120,
+Ilford,XP2 Super,400,C-41,35mm,36
+Ilford,SFX 200,200,B&N,35mm,36
+Kentmere,Kentmere 100,100,B&N,35mm,36
+Kentmere,Kentmere 200,200,B&N,35mm,36
+Kentmere,Kentmere 200,200,B&N,120,
+Kentmere,Kentmere 400,400,B&N,35mm,36
+Kentmere,Kentmere 400,400,B&N,120,
+Fujifilm,Fujicolor 200,200,C-41,35mm,36
+Fujifilm,Fujicolor X400,400,C-41,35mm,36
+Fujifilm,Velvia 50,50,E-6,35mm,36
+Fujifilm,Velvia 50,50,E-6,120,
+Fujifilm,Provia 100F,100,E-6,35mm,36
+Fujifilm,Provia 100F,100,E-6,120,
+Harman,Phoenix 200,200,C-41,35mm,36
+Harman,Phoenix 200,200,C-41,120,
+Harman,Red 125,125,C-41,35mm,36
+Cinestill,800T,800,C-41,35mm,36
+Cinestill,800T,800,C-41,120,
+Cinestill,400D,400,C-41,35mm,36
+Cinestill,400D,400,C-41,120,
+Cinestill,50D,50,C-41,35mm,36
+Cinestill,50D,50,C-41,120,
+Lomography,Color Negative 100,100,C-41,35mm,36
+Lomography,Color Negative 100,100,C-41,120,
+Lomography,Color Negative 400,400,C-41,35mm,36
+Lomography,Color Negative 400,400,C-41,120,
+Lomography,Color Negative 800,800,C-41,35mm,36
+Lomography,Color Negative 800,800,C-41,120,
+Lomography,Lady Grey 400,400,B&N,35mm,36
+Lomography,Earl Grey 100,100,B&N,35mm,36
+Lomography,Earl Grey 100,100,B&N,120,
+Lomography,LomoChrome Purple,100,C-41,35mm,36
+Lomography,LomoChrome Purple,100,C-41,120,
+Lomography,LomoChrome Metropolis,100,C-41,35mm,36
+Lomography,LomoChrome Metropolis,100,C-41,120,
+Foma,Fomapan 100,100,B&N,35mm,36
+Foma,Fomapan 100,100,B&N,120,
+Foma,Fomapan 200,200,B&N,35mm,36
+Foma,Fomapan 200,200,B&N,120,
+Foma,Fomapan 400,400,B&N,35mm,36
+Foma,Fomapan 400,400,B&N,120,
+Agfa,APX 100,100,B&N,35mm,36
+Agfa,APX 400,400,B&N,35mm,36
+Rollei,RPX 100,100,B&N,35mm,36
+Rollei,RPX 100,100,B&N,120,
+Rollei,Retro 80S,80,B&N,35mm,36
+Bergger,Pancro 400,400,B&N,35mm,36
+Bergger,Pancro 400,400,B&N,120,
