@@ -19,3 +19,6 @@ respaldos/
 
 # Registro de la tarea programada de recolectar.py: solo local.
 logs/
+
+# Claves de API y otros secretos: nunca en el repositorio.
+.env
