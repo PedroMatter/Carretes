@@ -36,6 +36,18 @@ FORMATOS_POR_CATEGORIA = {
     "Formato medio 120": "120",
 }
 
+# "Fomapan Classic 35mm 36exp" (id_externo 18309) está mal categorizado en
+# la propia tienda: lleva la categoría "Formato medio 120" en vez de
+# "35mm", aunque el nombre y la propia tabla de características de la
+# ficha dicen "Formato: 35mm". Comprobado a mano el 20/09/2026 contra la
+# API en vivo. Se revisaron los 67 candidatos de esa fecha buscando el
+# mismo patrón (categoría de formato que contradice al nombre) y este es
+# el único caso - no es sistemático, así que es una excepción puntual por
+# nombre exacto, no una regla general.
+EXCEPCIONES_FORMATO = {
+    "Fomapan Classic 35mm 36exp": "35mm",
+}
+
 
 def _nombres_categorias(producto):
     return {c["name"] for c in producto.get("categories", [])}
@@ -61,8 +73,12 @@ def _unidades_por_pack_desde_nombre(nombre):
     diagnóstico cuántas veces pasa cada patrón ("Double Pack", "tripack"...).
     """
     # "tripack 24×3": el número final tras x/× es el pack, no las
-    # exposiciones que puedan venir justo antes.
-    coincide_final = re.search(r"[x×]\s*(\d+)\s*$", nombre, re.IGNORECASE)
+    # exposiciones que puedan venir justo antes. La x/× tiene que ir
+    # pegada a un dígito ("24×3"), no a una letra: sin ese requisito,
+    # "Cinestillfilm bw Double xx 120" (nombre real de un carrete, por la
+    # película de cine Eastman Double-X) engancha la segunda "x" de "xx" y
+    # confunde el 120 final -que es el formato- con un pack de 120.
+    coincide_final = re.search(r"(?<=\d)[x×]\s*(\d+)\s*$", nombre, re.IGNORECASE)
     if coincide_final:
         return int(coincide_final.group(1)), None
 
@@ -186,7 +202,7 @@ def recolectar():
             continue
 
         descripcion_cruda = producto.get("description") or producto.get("short_description") or ""
-        formato = _formato_de_categorias(categorias)
+        formato = EXCEPCIONES_FORMATO.get(nombre) or _formato_de_categorias(categorias)
 
         if producto["type"] == "simple":
             precios = producto["prices"]
