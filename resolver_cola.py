@@ -279,7 +279,15 @@ def crear_producto_nuevo(conexion, nuevas_peliculas_sesion):
             (pelicula_id, formato, exposiciones),
         ).lastrowid
 
+        # Si el fichero no termina en salto de línea (por ejemplo, editado a
+        # mano en un editor que lo recorta), un "a" pegaría la fila nueva al
+        # final de la última línea existente en vez de en una línea propia.
+        contenido_previo = CATALOGO_CSV.read_bytes()
+        necesita_salto = contenido_previo and not contenido_previo.endswith(b"\n")
+
         with CATALOGO_CSV.open("a", newline="", encoding="utf-8") as archivo:
+            if necesita_salto:
+                archivo.write("\n")
             csv.writer(archivo).writerow(
                 [marca, nombre, iso, proceso, formato, exposiciones if exposiciones is not None else ""]
             )
