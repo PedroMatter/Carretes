@@ -47,6 +47,7 @@ OFERTAS_BRUTAS = [
 
 ARTICULOS = sorted({a for a, _, _ in OFERTAS_BRUTAS})
 OFERTAS = [Oferta(a, t, p) for a, t, p in OFERTAS_BRUTAS]
+DEMANDA = {a: 1 for a in ARTICULOS}  # un libro de cada, no hay packs de libros
 
 NOMBRES = {
     "lengua": "Lengua Castellana", "matematicas": "Matemáticas",
@@ -61,11 +62,11 @@ def main():
     print(f"LISTA: {len(ARTICULOS)} libros · {len(TIENDAS)} tiendas")
     print("=" * 66)
 
-    base = ingenuo(ARTICULOS, TIENDAS, OFERTAS)
+    base = ingenuo(DEMANDA, TIENDAS, OFERTAS)
     print("\n── Lo que hace un comparador (cada libro donde está más barato) ──\n")
     print(base.resumen())
 
-    opt = optimizar(ARTICULOS, TIENDAS, OFERTAS)
+    opt = optimizar(DEMANDA, TIENDAS, OFERTAS)
     print("\n── Lo que hace el optimizador (cesta completa con portes) ──\n")
     print(opt.resumen())
 
@@ -76,7 +77,7 @@ def main():
 
     # Muchas veces el óptimo puro reparte en más pedidos de los que uno quiere
     # recibir. Esta es la versión "quiero como mucho 2 paquetes".
-    lim = optimizar(ARTICULOS, TIENDAS, OFERTAS, max_tiendas=2)
+    lim = optimizar(DEMANDA, TIENDAS, OFERTAS, max_tiendas=2)
     print("\n── Óptimo con un máximo de 2 pedidos ──\n")
     print(lim.resumen())
     print(f"\n>> Cuesta {lim.total - opt.total:+.2f} € frente al óptimo libre, "

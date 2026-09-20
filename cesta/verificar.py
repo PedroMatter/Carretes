@@ -13,7 +13,7 @@ import itertools
 import random
 
 from optimizador import Tienda, Oferta, optimizar, _cent
-from ejemplo import TIENDAS, OFERTAS, ARTICULOS
+from ejemplo import TIENDAS, OFERTAS, ARTICULOS, DEMANDA
 
 
 def coste_total(asignacion: dict[str, str], tiendas: list[Tienda],
@@ -52,6 +52,86 @@ def fuerza_bruta(articulos, tiendas, ofertas):
     return mejor_coste, n
 
 
+# ─────────────────────────────────────────────────────────────────────────────
+# Packs: fuerza bruta por cantidad de cada oferta, no por asignación 1-a-1
+# ─────────────────────────────────────────────────────────────────────────────
+
+def fuerza_bruta_packs(demanda, tiendas, ofertas):
+    """Enumera cuántos packs de CADA oferta comprar (0, 1, 2...), se queda
+    con las combinaciones que cubren la demanda de cada producto, y calcula
+    el coste real (packs + portes) de la más barata.
+
+    El rango de cada oferta va de 0 a demanda(producto)//pack + 2: nunca
+    hace falta más que eso, ni comprando esa oferta sola, y el +2 es margen
+    para no cortar por casos de redondeo en instancias tan pequeñas.
+    """
+    por_tienda = {t.id: t for t in tiendas}
+    rangos = [
+        range(0, demanda[o.articulo_id] // o.unidades_por_pack + 2) for o in ofertas
+    ]
+
+    mejor_coste = None
+    n = 0
+    for combo in itertools.product(*rangos):
+        n += 1
+        unidades = {p: 0 for p in demanda}
+        for cantidad, o in zip(combo, ofertas):
+            unidades[o.articulo_id] += cantidad * o.unidades_por_pack
+        if any(unidades[p] < demanda[p] for p in demanda):
+            continue
+
+        subtotales: dict[str, int] = {}
+        for cantidad, o in zip(combo, ofertas):
+            if cantidad:
+                subtotales[o.tienda_id] = (
+                    subtotales.get(o.tienda_id, 0) + _cent(o.precio) * cantidad
+                )
+
+        total = 0
+        for tid, sub in subtotales.items():
+            t = por_tienda[tid]
+            total += sub
+            gratis = (t.envio_gratis_desde is not None
+                      and sub >= _cent(t.envio_gratis_desde))
+            if not gratis:
+                total += _cent(t.porte)
+
+        if mejor_coste is None or total < mejor_coste:
+            mejor_coste = total
+    return mejor_coste, n
+
+
+def caso_aleatorio_packs(semilla: int):
+    """Instancia pequeña al azar con productos, varias ofertas por (producto,
+    tienda) con distinto tamaño de pack, y reparto libre entre tiendas.
+    """
+    rnd = random.Random(semilla)
+    n_prod = rnd.randint(1, 2)
+    n_tie = rnd.randint(2, 3)
+    productos = [f"p{i}" for i in range(n_prod)]
+    demanda = {p: rnd.randint(1, 4) for p in productos}
+
+    tiendas = []
+    for j in range(n_tie):
+        umbral = rnd.choice([None, 10.0, 20.0])
+        tiendas.append(Tienda(f"t{j}", f"Tienda {j}",
+                              porte=rnd.choice([0.0, 2.5, 4.0]),
+                              envio_gratis_desde=umbral))
+
+    ofertas = []
+    for p in productos:
+        disp = rnd.sample(tiendas, rnd.randint(1, n_tie))
+        for t in disp:
+            pack = rnd.choice([1, 2, 3])
+            precio_unidad = round(rnd.uniform(2, 10), 2)
+            # el pack a veces sale más barato por unidad, a veces no - el
+            # optimizador tiene que acertar en los dos casos
+            precio_pack = round(precio_unidad * pack * rnd.uniform(0.8, 1.05), 2)
+            ofertas.append(Oferta(p, t.id, precio_pack, pack))
+
+    return demanda, tiendas, ofertas
+
+
 def caso_aleatorio(semilla: int):
     """Genera una instancia pequeña al azar para castigar el modelo."""
     rnd = random.Random(semilla)
@@ -74,21 +154,22 @@ def caso_aleatorio(semilla: int):
 
 
 def main():
-    print("── Caso de los libros de texto ──")
+    print("── Caso de los libros de texto (sin packs, demanda 1 cada uno) ──")
     bruto, n = fuerza_bruta(ARTICULOS, TIENDAS, OFERTAS)
-    milp = optimizar(ARTICULOS, TIENDAS, OFERTAS)
+    milp = optimizar(DEMANDA, TIENDAS, OFERTAS)
     print(f"combinaciones evaluadas: {n}")
     print(f"fuerza bruta: {bruto/100:.2f} €")
     print(f"MILP:         {milp.total:.2f} €")
     assert abs(bruto / 100 - milp.total) < 0.005, "NO COINCIDE"
     print("coinciden ✓\n")
 
-    print("── 40 instancias aleatorias ──")
+    print("── 40 instancias aleatorias (sin packs) ──")
     fallos = 0
     for s in range(40):
         arts, tis, ofs = caso_aleatorio(s)
+        demanda = {a: 1 for a in arts}
         b, _ = fuerza_bruta(arts, tis, ofs)
-        m = optimizar(arts, tis, ofs)
+        m = optimizar(demanda, tis, ofs)
         if abs(b / 100 - m.total) >= 0.005:
             fallos += 1
             print(f"  semilla {s}: bruta {b/100:.2f} vs MILP {m.total:.2f}  ✗")
@@ -96,6 +177,24 @@ def main():
         print("40/40 coinciden ✓")
     else:
         print(f"{fallos} fallos ✗")
+        raise SystemExit(1)
+
+    print("\n── 30 instancias aleatorias CON packs y reparto entre tiendas ──")
+    fallos_packs = 0
+    for s in range(30):
+        demanda, tis, ofs = caso_aleatorio_packs(s)
+        b, n = fuerza_bruta_packs(demanda, tis, ofs)
+        m = optimizar(demanda, tis, ofs)
+        if abs(b / 100 - m.total) >= 0.005:
+            fallos_packs += 1
+            print(
+                f"  semilla {s}: bruta {b/100:.2f} vs MILP {m.total:.2f}  ✗  "
+                f"(demanda={demanda})"
+            )
+    if fallos_packs == 0:
+        print("30/30 coinciden ✓")
+    else:
+        print(f"{fallos_packs} fallos ✗")
         raise SystemExit(1)
 
 
