@@ -130,7 +130,11 @@ claramente que no tenemos sus precios, en vez de fingir que sí.
 1. **Esquema y catálogo canónico.** Sembrar a mano los 40-50 stocks que
    importan en España, en sus formatos. Se hace a mano y con cuidado.
 2. **Una tienda de punta a punta.** Traer, parsear, emparejar, guardar
-   observaciones. *Hecho cuando lleva siete días corriendo solo.*
+   observaciones. *Hecho cuando guarda observaciones sin intervención manual
+   — no hay que esperar un plazo fijo para saberlo: cada tienda va aislada
+   (principio 4), así que la señal es vigilar la tabla `ejecucion` por
+   tienda de forma continua, no un cronómetro. Un fallo en una tienda no
+   bloquea seguir avanzando con las demás.*
 3. **La segunda tienda**, que es cuando aparecen los problemas de
    emparejamiento de verdad. *Hecho cuando añadir la tercera cuesta una hora.*
 4. **El optimizador** de cesta con packs y umbrales.
