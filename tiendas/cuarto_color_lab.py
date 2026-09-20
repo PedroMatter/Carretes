@@ -48,6 +48,14 @@ EXCEPCIONES_FORMATO = {
     "Fomapan Classic 35mm 36exp": "35mm",
 }
 
+# "Kodak Gold 35mm Tripack" dice "Tripack" sin ningún número en el nombre.
+# Comprobado a mano en la ficha en vivo de la tienda el 20/09/2026:
+# Nº Exposiciones 36, tripack = 3 unidades. No se generaliza "tri" = 3 para
+# otros nombres - esto es solo para este nombre exacto, verificado.
+EXCEPCIONES_UNIDADES_POR_PACK = {
+    "Kodak Gold 35mm Tripack": 3,
+}
+
 
 def _nombres_categorias(producto):
     return {c["name"] for c in producto.get("categories", [])}
@@ -71,6 +79,16 @@ def _unidades_por_pack_desde_nombre(nombre):
     """Devuelve (unidades, motivo_incierto). motivo_incierto solo lleva
     valor cuando no se pudo determinar el número, para poder contar en el
     diagnóstico cuántas veces pasa cada patrón ("Double Pack", "tripack"...).
+    """
+    if nombre in EXCEPCIONES_UNIDADES_POR_PACK:
+        return EXCEPCIONES_UNIDADES_POR_PACK[nombre], None
+    return _unidades_por_pack_desde_nombre_sin_excepciones(nombre)
+
+
+def _unidades_por_pack_desde_nombre_sin_excepciones(nombre):
+    """Igual que la función de arriba, pero sin mirar la tabla de
+    excepciones - así _unidades_por_pack_desde_nombre puede consultarla
+    primero sin recursión infinita.
     """
     # "tripack 24×3": el número final tras x/× es el pack, no las
     # exposiciones que puedan venir justo antes. La x/× tiene que ir
