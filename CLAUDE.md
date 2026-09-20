@@ -80,6 +80,13 @@ observacion   un precio en un momento: anuncio + precio + disponible + capturado
 - **El tamaño del pack es del anuncio, no del producto.** Portra suelto y
   Portra en pack de 5 son el mismo producto en dos anuncios.
 
+**Pendiente: ISO variable.** Algunas películas no tienen un ISO fijo, sino un
+rango pensado para exponerse a distintas sensibilidades: Lomography Redscale
+(50-200), Turquoise (100-400), Purple y LomoChrome Metropolis (100-400).
+`pelicula.iso` guarda de momento solo el extremo bajo del rango, que no es
+todo el dato. Antes de que la web muestre el ISO de estas películas hace
+falta un `iso_max` opcional en el esquema (migración, no borrar y recrear).
+
 ---
 
 ## Alcance de la v1
@@ -212,6 +219,17 @@ de una sentada. La fatiga de revisión es el riesgo real de este método.
 carrete, sí o no?», sobre cientos de productos por tienda y pasada. Pregunta
 binaria, repetida, a volumen, sobre un espacio cerrado. Ese es su perfil, y
 no el emparejamiento.
+
+**Un mismo producto con dos nombres distintos, a la vez.** En marzo de 2026,
+Eastman Kodak renombró parte de su gama: Portra pasó a llamarse Ektacolor
+Pro, y T-Max pasó a Ektapan — misma película, distinto nombre, porque Kodak
+Alaris (quien fabricaba y vendía con los nombres antiguos) se quedó esos
+nombres. Las tiendas venden las dos versiones a la vez, a precios distintos,
+así que no es una migración de nombre limpia: son dos anuncios reales y
+simultáneos del mismo producto. La tabla `equivalencia` ya lo resuelve sin
+cambios: `(tienda, nombre_original)` admite tantos nombres como haga falta
+apuntando al mismo `producto_id`, así que «Ektacolor Pro 400 35mm 36 exp» y
+«Portra 400 35mm 36 exp» conviven señalando al mismo sitio.
 
 ---
 
