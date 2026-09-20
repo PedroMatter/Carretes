@@ -232,6 +232,16 @@ lado del producto propuesto, ordenado por riesgo — primero las dudosas y las
 que no ha sabido emparejar, al final las obvias — y por bloques, no las 120
 de una sentada. La fatiga de revisión es el riesgo real de este método.
 
+**Pendiente: revisar y corregir equivalencias ya tomadas.** Primer caso real
+(20/09/2026): se resolvió «Carrete Eastman Kodak Ektapan 400» como una
+película nueva, creyendo que Ektapan era una marca propia — antes de saber
+que es el T-Max renombrado. Quedó un producto duplicado hasta que alguien se
+dio cuenta a mano. Hoy la única forma de corregir una equivalencia ya tomada
+es SQL directo, y por diseño no vuelve a preguntarse sola: una decisión
+tomada con información mala no se revisa nunca si nadie va a buscarla.
+Hace falta una forma de repasar equivalencias existentes, no solo las
+pendientes.
+
 **Dónde sí encaja Jev con claridad.** En el filtro previo, «¿esto es un
 carrete, sí o no?», sobre cientos de productos por tienda y pasada. Pregunta
 binaria, repetida, a volumen, sobre un espacio cerrado. Ese es su perfil, y
