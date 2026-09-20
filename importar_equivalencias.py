@@ -34,8 +34,8 @@ RAIZ = Path(__file__).parent
 EQUIVALENCIAS_CSV = RAIZ / "equivalencias.csv"
 
 
-def leer_csv():
-    with EQUIVALENCIAS_CSV.open(encoding="utf-8") as archivo:
+def leer_csv(ruta):
+    with ruta.open(encoding="utf-8") as archivo:
         return list(csv.DictReader(archivo))
 
 
@@ -155,9 +155,14 @@ def escribir(conexion, registros):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--simular", action="store_true")
+    parser.add_argument(
+        "--archivo",
+        default=str(EQUIVALENCIAS_CSV),
+        help="CSV a importar (por defecto equivalencias.csv).",
+    )
     args = parser.parse_args()
 
-    filas = leer_csv()
+    filas = leer_csv(Path(args.archivo))
     conexion = db.conectar()
     nuevas, iguales, cambios, errores = analizar(conexion, filas)
 

@@ -124,6 +124,13 @@ categorice junto a sus carretes.
   son el mismo material. No juntamos la 4hundred de una tienda con un
   genérico 400 de otra. Si algún día se confirma que son lo mismo, se junta
   entonces.
+- **Los reenvasados nunca se funden en automático con el producto oficial
+  del fabricante, aunque compartan la misma emulsión base.** "El Faro"
+  reenvasa Kodak Vision3 sin tocar la emulsión, y aun así cada caso se le
+  pregunta a Pedro antes de decidir fundir o catalogar aparte — no se
+  codifica un criterio automático (del tipo "si no quita el remjet, es lo
+  mismo"). La fusión de Vision3 250D/500T "El Faro" con los Kodak Vision3
+  oficiales (20/09/2026) se decidió así, caso por caso, no por regla.
 
 ---
 
