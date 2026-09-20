@@ -20,6 +20,23 @@ CATEGORIA_INSTANTANEA = "Carretes para Cámaras Instantánea"
 CATEGORIA_CADUCADOS = "Carretes Caducados"
 CATEGORIA_110 = "110"
 
+# Estos 7 productos dicen "Pack" en el nombre pero, a diferencia del resto de
+# la tienda (que dice "Pack 5", "Pack3"...), no incluyen el número en ningún
+# sitio de la ficha - ni en el nombre ni en la descripción. Se comprobó a
+# mano en la web de la tienda el 20/09/2026: los 7 son packs de 3 unidades.
+# No es una regla general del extractor, es una excepción puntual para estos
+# nombres exactos - si la tienda cambia el nombre de alguno, deja de aplicar
+# y hay que volver a comprobarlo a mano.
+EXCEPCIONES_UNIDADES_POR_PACK = {
+    "Carrete Lomography CN 100 35mm Pack 36 exp": 3,
+    "Carrete Lomography CN 400 120 Pack": 3,
+    "Carrete Lomography CN 400 35mm Pack 36 exp": 3,
+    "Carrete Lomography CN 800 120 Pack": 3,
+    "Carrete Lomography CN 800 35mm Pack 36 exp": 3,
+    "Carrete Lomography Lady Grey 400 120 Pack": 3,
+    "Carrete Lomography Lady Grey 400 35mm Pack 36 exp": 3,
+}
+
 
 def _nombres_categorias(producto):
     return {c["name"] for c in producto.get("categories", [])}
@@ -38,6 +55,9 @@ def _extraer_campos_descripcion(descripcion_html):
 
 
 def _unidades_por_pack(nombre, descripcion_html, campos):
+    if nombre in EXCEPCIONES_UNIDADES_POR_PACK:
+        return EXCEPCIONES_UNIDADES_POR_PACK[nombre]
+
     valor = campos.get("unidades")
     if valor is not None:
         numero = re.search(r"\d+", valor)
