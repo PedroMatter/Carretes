@@ -1,0 +1,158 @@
+Cuarto Color Lab: 26 filas de cola_revision pendientes de repaso (20/09/2026)
+
+Contexto: se reconstruyó un análisis de "confianza alta" sin tener el CSV
+de sugerencias original. El motor (resolver_cola.py) sugiere un producto
+del catálogo por parecido de texto; estas 26 filas no pasaron las tres
+comprobaciones cruzadas (formato real coincide, marca aparece en el
+nombre, nombre de película aparece en el nombre) que sí pasaron las 41 ya
+importadas. Ninguna se ha tocado en la base de datos: siguen en
+cola_revision con resuelto=0.
+
+===============================================================================
+GRUPO A - probablemente correctas, piden un "sí" rápido
+(fallan la comprobación por un motivo inocente: falta una palabra en el
+nombre de la tienda, no porque el emparejamiento esté mal)
+===============================================================================
+
+1. "Harman Phoenix II 120"
+   Sugerencia: Harman / Phoenix II 200 / 120
+   Por qué en A: el nombre de la tienda omite el "200" (ISO), pero Harman
+   solo tiene una Phoenix II en el catálogo.
+
+2. "Harman Phoenix II 35mm"
+   Sugerencia: Harman / Phoenix II 200 / 35mm / 36exp
+   Por qué en A: mismo motivo que la anterior, en 35mm.
+
+3. "Kentmere Pan 200 120"
+   Sugerencia: Kentmere / Kentmere 200 / 120
+   Por qué en A: el nombre de la tienda dice "Pan 200", el catálogo tiene
+   "Kentmere 200" (la propia marca Kentmere repite su nombre en el
+   nombre de película, y la tienda no lo hace).
+
+4. "Kentmere PAN 200 35mm"
+   Sugerencia: Kentmere / Kentmere 200 / 35mm / 36exp
+   Por qué en A: mismo motivo, en 35mm.
+
+5. "Kentmere Pan 400 35mm"
+   Sugerencia: Kentmere / Kentmere 400 / 35mm / 36exp
+   Por qué en A: mismo motivo, con el 400.
+
+6. "CineStill Double-X 35mm"
+   Sugerencia: Cinestill / XX / 35mm / 36exp
+   Por qué en A: "Double-X" es el nombre comercial que usa CineStill
+   para su XX (por la película de cine Eastman Double-X). Hace falta
+   saber esa equivalencia, el texto por sí solo no la delata.
+
+7. "Cinestillfilm bw Double xx 120"
+   Sugerencia: Cinestill / XX / 120
+   Por qué en A: mismo caso que el anterior, en 120. (Esta fila es la
+   que tenía el bug de unidades_por_pack=120 - ya corregido a 1; el
+   formato y el pack ya están bien, solo falta el emparejamiento.)
+
+8. "Fomapan Classic 100 120"
+   Sugerencia: Foma / Fomapan 100 / 120
+   Por qué en A: el "100" sí está en el nombre de la tienda; falló la
+   comprobación automática por un motivo que no identifiqué del todo
+   (posible orden de palabras). Revisar y probablemente aceptar.
+
+9. "Kodak Portra 400"
+   Sugerencia: Kodak / Portra 400 / 120
+   Por qué en A: el nombre de la tienda no dice el formato, pero el
+   dato de formato capturado por el adaptador para este anuncio
+   concreto es 120, y solo hay un Portra 400 en 120.
+
+10. "Lucky color film 200 35mm"
+    Sugerencia: Lucky / Lucky Color C200 / 35mm / 36exp
+    Por qué en A: la tienda dice "color film 200", el catálogo tiene
+    "Lucky Color C200" - mismo producto, otra forma de escribirlo.
+
+11. "Candido Color Film 400 35mm"
+    Sugerencia: Candido / Candido 400 / 35mm / 36exp
+    Por qué en A: "Color Film" es descriptivo, no parte del nombre.
+
+12. "Lomography Color 400 35mm – Pack 3"
+    Sugerencia: Lomography / Color Negative 400 / 35mm / 36exp
+    Por qué en A: "Color 400" vs "Color Negative 400" - mismo producto,
+    nombre abreviado por la tienda.
+
+13. "Lomography Color 400 120 – Pack 3"
+    Sugerencia: Lomography / Color Negative 400 / 120
+    Por qué en A: mismo caso que el anterior, en 120.
+
+14. "LomoChrome Metropolis"
+    Sugerencia: Lomography / LomoChrome Metropolis / 120
+    Por qué en A: el nombre no dice el formato, pero comprobado el dato
+    real capturado del anuncio (id_externo 23032): formato=120. Encaja
+    directo con la variante de 120 del catálogo.
+
+15. "LomoChrome Metropolis 35mm"
+    Sugerencia: Lomography / LomoChrome Metropolis / 35mm / 36exp
+    Por qué en A: aquí sí dice el formato, debería ser directo.
+
+16. "LomoChrome Color’92 35mm"
+    Sugerencia: Lomography / LomoChrome Color '92 Sun-Kissed / 35mm / 36exp
+    (o el LomoChrome Color 92 normal, sin Sun-Kissed - a confirmar cuál
+    de los dos es este anuncio en concreto, mirando la ficha)
+    Por qué en A: hay DOS películas parecidas en el catálogo (Color 92
+    normal y Color 92 Sun-Kissed); hace falta mirar la ficha del anuncio
+    para saber cuál es este, no asumir.
+
+17. "2021 LomoChrome Purple Pétillant 35 mm ISO 100–400"
+    Sugerencia: Lomography / LomoChrome Purple / 35mm / 36exp
+    Por qué en A: "Pétillant" parece un nombre de edición/lote, no una
+    película distinta; el ISO variable 100-400 coincide con la Purple ya
+    catalogada.
+
+===============================================================================
+GRUPO B - de verdad ambiguas, necesitan una decisión, no solo un "sí"
+===============================================================================
+
+1. "Kodak Gold tripack 24×3"
+   Duda: ¿es un pack de rollos de 24 exposiciones o de 36? El catálogo
+   tiene las dos variantes de Gold 200 35mm (24exp y 36exp) y el nombre
+   no lo aclara - "24×3" podría leerse como "24exp × 3 unidades" o como
+   otra cosa. Hay que mirar la ficha de la tienda para el número de
+   exposiciones real.
+
+2. "Kodak Gold 35mm Tripack"
+   Duda: la misma que la anterior, sin ni siquiera el "24" de pista.
+
+3. "Lucky color film 200 120"
+   Duda: el catálogo solo tiene Lucky Color C200 en 35mm. ¿Existe de
+   verdad una versión en 120, o es un error de categoría/formato de la
+   tienda (como el caso de Fomapan) y en realidad es la misma película
+   en 35mm mal etiquetada?
+
+4. "Fujifilm Speed Film 200"
+   Duda: no identifico a qué stock real de Fujifilm corresponde "Speed
+   Film". Mi primer intento lo emparejó con Provia 100F por puro
+   parecido de texto (marca + formato), pero Provia es diapositiva E-6
+   ISO 100 y esto se vende como ISO 200 color negativo - emparejamiento
+   descartado por incorrecto, no solo dudoso. Si "Speed Film" es un
+   reenvasado de otro fabricante (como El Faro), aplica la regla nueva
+   de CLAUDE.md: se pregunta caso por caso, no se fusiona con nada
+   existente sin confirmar qué es.
+
+5. "Fujifilm 400 Speed Film 35mm"
+   Duda: mismo caso que el anterior, con ISO 400.
+
+6. "FujiFilm 200 Speed Film 35mm"
+   Duda: comprobado - es un anuncio distinto del "Fujifilm Speed Film
+   200 Pack 3x36exp" (id_externo 255 frente a 25713, URLs distintas):
+   uno suelto, el otro en pack de 3. Mismo producto probable, dos
+   anuncios reales, no un duplicado. La duda de fondo sigue siendo la
+   misma: no sé a qué stock real de Fujifilm corresponde "Speed Film".
+
+7. "Lomography Earl Grey 100/36 – 3 pack"
+   Duda: mi motor de sugerencia propuso la variante de 120 del
+   catálogo, pero el formato real capturado del anuncio es 35mm (pack
+   de 3, ya bien detectado). El catálogo SÍ tiene "Lomography Earl Grey
+   100" en 35mm/36exp (ya existía, no hace falta crear ficha) - el
+   fallo fue solo de mi motor de sugerencia al elegir la variante
+   equivocada, no una ambigüedad real. Casi seguro que va aquí:
+   Lomography / Earl Grey 100 / 35mm / 36exp. La dejo en el Grupo B por
+   prudencia, pero es la que más confianza me da de las siete.
+
+===============================================================================
+Ninguna de estas 26 filas se ha tocado en la base de datos.
+===============================================================================
