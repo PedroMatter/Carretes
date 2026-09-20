@@ -10,11 +10,14 @@ env/
 # Caché de Python compilado, se regenera solo.
 __pycache__/
 
-# Base de datos: contiene datos reales y no debe estar en un repo público.
-carretes.db
+# carretes.db YA NO se ignora: Streamlit Cloud despliega desde una copia
+# limpia del repo, así que sin la base de datos aquí la web en la nube
+# arranca vacía (encontrado el 20/09/2026: el comparador no encontraba
+# nada). Es un arreglo provisional - lo correcto es exportar a CSV y
+# reconstruir al desplegar, pendiente de hacer. Nada de lo que hay dentro
+# es sensible: son precios públicos de tiendas y datos propios anónimos.
 
-# Copias de seguridad que hace aplicar_migracion.py antes de tocar nada:
-# mismo motivo que carretes.db.
+# Copias de seguridad que hace aplicar_migracion.py antes de tocar nada.
 respaldos/
 
 # Registro de la tarea programada de recolectar.py: solo local.
