@@ -10,31 +10,71 @@ evitar (ver CLAUDE.md, "Lo que hace distinto a esto de un comparador
 normal").
 """
 
+import difflib
+import re
+import unicodedata
 from datetime import datetime, timezone
 
 import db
 
 
-def buscar_peliculas(texto):
-    """Películas cuyo "marca nombre" contiene `texto`, sin distinguir
-    mayúsculas. Con texto vacío, devuelve el catálogo entero (no son
-    tantas películas como para que haga falta esconderlas).
+def _normalizar(texto):
+    """minúsculas, sin acentos, sin espacios ni símbolos - solo letras y
+    números pegados. Así "Vision 3 250 D" y "Vision3 250D" se comparan
+    como la misma cadena.
     """
+    sin_acentos = unicodedata.normalize("NFKD", texto).encode("ascii", "ignore").decode()
+    return re.sub(r"[^a-z0-9]", "", sin_acentos.lower())
+
+
+def _todas_las_peliculas():
     conexion = db.conectar()
-    patron = f"%{texto}%"
     filas = conexion.execute(
-        """
-        SELECT id, marca, nombre, iso, proceso FROM pelicula
-        WHERE (marca || ' ' || nombre) LIKE ? COLLATE NOCASE
-        ORDER BY marca, nombre
-        """,
-        (patron,),
+        "SELECT id, marca, nombre, iso, proceso FROM pelicula ORDER BY marca, nombre"
     ).fetchall()
     conexion.close()
     return [
         {"id": id_, "marca": marca, "nombre": nombre, "iso": iso, "proceso": proceso}
         for id_, marca, nombre, iso, proceso in filas
     ]
+
+
+def buscar_peliculas(texto):
+    """Películas cuyo "marca nombre" normalizado contiene el texto de
+    búsqueda, también normalizado. Con texto vacío, devuelve el catálogo
+    entero (no son tantas películas como para que haga falta esconderlas).
+    """
+    peliculas = _todas_las_peliculas()
+    if not texto:
+        return peliculas
+
+    patron = _normalizar(texto)
+    return [
+        p for p in peliculas if patron in _normalizar(f"{p['marca']} {p['nombre']}")
+    ]
+
+
+def sugerir_peliculas(texto, maximo=5):
+    """Cuando buscar_peliculas no encuentra nada: las películas más
+    parecidas por texto, para no dejar al usuario con un callejón sin
+    salida. Es solo una sugerencia visual, no un emparejamiento - aquí no
+    hay ninguna decisión de datos de por medio, así que no choca con el
+    principio 2 (eso es sobre emparejar anuncios de tiendas, no sobre
+    ayudar a un humano a encontrar lo que ya está buscando él mismo).
+    """
+    peliculas = _todas_las_peliculas()
+    patron = _normalizar(texto)
+    puntuadas = [
+        (
+            difflib.SequenceMatcher(
+                None, patron, _normalizar(f"{p['marca']} {p['nombre']}")
+            ).ratio(),
+            p,
+        )
+        for p in peliculas
+    ]
+    puntuadas.sort(key=lambda par: par[0], reverse=True)
+    return [p for _, p in puntuadas[:maximo]]
 
 
 def productos_de_pelicula(pelicula_id):

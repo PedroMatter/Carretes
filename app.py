@@ -13,7 +13,9 @@ if not texto:
 peliculas = comparador.buscar_peliculas(texto) if texto else []
 
 if texto and not peliculas:
-    st.write("No hay ninguna película en el catálogo que coincida con eso.")
+    st.write("No hay ninguna película en el catálogo que coincida exactamente con eso. ¿Quizás una de estas?")
+    for sugerida in comparador.sugerir_peliculas(texto):
+        st.markdown(f"- {sugerida['marca']} {sugerida['nombre']}")
 
 for pelicula in peliculas:
     productos = comparador.productos_de_pelicula(pelicula["id"])
