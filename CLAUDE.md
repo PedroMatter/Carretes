@@ -105,6 +105,12 @@ gran formato, cine (Super 8, 16mm).
 publican precios, así que no hay dato que capturar. Si se mencionan, se dice
 claramente que no tenemos sus precios, en vez de fingir que sí.
 
+**Cámaras desechables, aunque lleven categoría de carrete.** Descubierto con
+Cuarto Color Lab (20/09/2026): una cámara desechable con carrete de fábrica
+cobra por la cámara entera, no por un carrete suelto, y comparar su precio
+como si fuera un carrete induciría a error. Se excluyen aunque la tienda las
+categorice junto a sus carretes.
+
 **Dos reglas para las marcas propias y los reenvasados:**
 
 - **Dos nombres se funden en un solo producto únicamente cuando lo dice el

@@ -15,7 +15,12 @@ from datetime import datetime, timezone
 
 import db
 import emparejar
-from tiendas import la_peliculera
+from tiendas import cuarto_color_lab, la_peliculera
+
+TIENDAS_DISPONIBLES = {
+    "la_peliculera": la_peliculera,
+    "cuarto_color_lab": cuarto_color_lab,
+}
 
 
 def informar(candidatos, diagnostico):
@@ -29,6 +34,12 @@ def informar(candidatos, diagnostico):
 
     inciertos = sum(1 for c in candidatos if c.unidades_por_pack is None)
     print(f"Candidatos con unidades_por_pack sin determinar: {inciertos}")
+
+    desglose = diagnostico.get("packs_sin_determinar_por_tipo")
+    if desglose:
+        print("  Desglose por patrón (por si algún día merece una regla propia):")
+        for patron, cantidad in desglose.items():
+            print(f"    {patron!r}: {cantidad}")
 
     nombres = Counter(c.nombre_original for c in candidatos)
     repetidos = {nombre: n for nombre, n in nombres.items() if n > 1}
@@ -258,14 +269,21 @@ def main():
         action="store_true",
         help="Trae y filtra, imprime el resultado, no escribe nada en la base de datos.",
     )
+    parser.add_argument(
+        "--tienda",
+        choices=sorted(TIENDAS_DISPONIBLES),
+        default="la_peliculera",
+        help="Qué tienda recolectar. Por defecto La Peliculera (para no romper la tarea programada).",
+    )
     args = parser.parse_args()
+    tienda_modulo = TIENDAS_DISPONIBLES[args.tienda]
 
     if args.simular:
-        candidatos, diagnostico = la_peliculera.recolectar()
+        candidatos, diagnostico = tienda_modulo.recolectar()
         informar(candidatos, diagnostico)
         imprimir_candidatos(candidatos)
     else:
-        guardar(la_peliculera)
+        guardar(tienda_modulo)
 
 
 if __name__ == "__main__":
