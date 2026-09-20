@@ -163,6 +163,7 @@ def guardar(tienda_modulo):
 
         vistos_id_externo = set()
         cola_creadas = 0
+        saltados_por_pack_desconocido = 0
 
         for candidato in candidatos:
             resultado = emparejar.resolver(conexion, tienda, candidato.nombre_original)
@@ -194,6 +195,23 @@ def guardar(tienda_modulo):
                 continue
 
             producto_id = resultado
+
+            if candidato.unidades_por_pack is None:
+                # Está emparejado con un producto real, pero nadie ha dicho
+                # todavía cuántas unidades tiene el pack - y anuncio exige
+                # ese dato. No se puede inventar un número, así que se
+                # salta con aviso en vez de reventar la pasada entera.
+                # Se cuenta como "visto" para que no se marque como
+                # desaparecido si en el futuro ya tuviera anuncio.
+                print(
+                    f"AVISO: {tienda} {candidato.id_externo} ({candidato.nombre_original}) "
+                    f"está emparejado pero no se sabe el tamaño del pack - no se "
+                    f"guarda el anuncio hasta que se resuelva unidades_por_pack."
+                )
+                vistos_id_externo.add(candidato.id_externo)
+                saltados_por_pack_desconocido += 1
+                continue
+
             anuncio_id = obtener_o_crear_anuncio(
                 conexion,
                 tienda,
@@ -236,6 +254,11 @@ def guardar(tienda_modulo):
         print(f"Filas nuevas en cola_revision: {cola_creadas}")
         print(f"Anuncios con observación nueva: {anuncios_con_observacion}")
         print(f"Marcados como no disponibles (desaparecidos): {desaparecidos}")
+        if saltados_por_pack_desconocido:
+            print(
+                f"Emparejados pero sin guardar por pack desconocido: "
+                f"{saltados_por_pack_desconocido}"
+            )
 
     except Exception as error:
         conexion.rollback()

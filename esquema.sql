@@ -101,6 +101,13 @@ CREATE TABLE IF NOT EXISTS equivalencia (
 -- (cuántos trajo la tienda) y anuncios_vistos (cuántos acabaron con
 -- observación guardada) van por separado: si se mezclaran, un recolector
 -- que dejara de guardar nada seguiría pareciendo sano.
+--
+-- El orden de las columnas de abajo importa para quien lea con SELECT *:
+-- una base de datos migrada desde antes de la migración 003 podía tener
+-- este mismo orden físicamente distinto (candidatos_vistos se añadió al
+-- final con ALTER TABLE ADD COLUMN). Si el orden vuelve a no coincidir
+-- con lo de aquí, es señal de que hace falta otra migración de reordenar,
+-- no de que el dato esté mal.
 CREATE TABLE IF NOT EXISTS ejecucion (
     id                INTEGER PRIMARY KEY,
     tienda            TEXT NOT NULL,
