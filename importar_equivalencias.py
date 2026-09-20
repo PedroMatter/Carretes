@@ -5,6 +5,10 @@ en resolver_cola.py. Busca cada producto por su identidad real (marca,
 película, formato, exposiciones) porque el CSV no lleva producto_id — ver
 exportar_equivalencias.py para el motivo.
 
+Cada fila que se escribe (nueva, cambiada, o ya igual) cierra también su
+fila de cola_revision si la tenía pendiente: si no, resolver_cola.py
+volvería a preguntar por algo que este importador ya dejó resuelto.
+
 Uso:
     python importar_equivalencias.py             # importa de verdad
     python importar_equivalencias.py --simular   # solo informa, no escribe
@@ -140,6 +144,12 @@ def escribir(conexion, registros):
             """,
             (r["tienda"], r["nombre_original"], r["producto_id"]),
         )
+        # Si esta fila estaba en la cola, ciérrala: ya no hay nada pendiente
+        # que preguntar sobre ella. Si no estaba en la cola, no toca nada.
+        conexion.execute(
+            "UPDATE cola_revision SET resuelto = 1 WHERE tienda = ? AND nombre_original = ?",
+            (r["tienda"], r["nombre_original"]),
+        )
 
 
 def main():
@@ -176,7 +186,7 @@ def main():
         conexion.close()
         return
 
-    if not nuevas and not cambios:
+    if not nuevas and not cambios and not iguales:
         print("Nada que importar.")
         conexion.close()
         return
@@ -189,7 +199,9 @@ def main():
             return
 
     try:
-        escribir(conexion, nuevas + cambios)
+        # iguales también pasa por escribir(): la equivalencia no cambia,
+        # pero puede que cola_revision siguiera sin marcar como resuelta.
+        escribir(conexion, nuevas + cambios + iguales)
         conexion.commit()
     except Exception:
         conexion.rollback()
