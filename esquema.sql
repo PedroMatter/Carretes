@@ -10,6 +10,17 @@ CREATE TABLE IF NOT EXISTS pelicula (
     UNIQUE (marca, nombre)
 );
 
+-- La tienda como entidad propia. Deliberadamente simple para la v1
+-- (comparador de precios, sin cesta ni envíos): solo si es online, física
+-- o las dos, y dónde está si tiene local. porte y envio_gratis_desde se
+-- quedan fuera hasta que el optimizador de cesta (cesta/optimizador.py,
+-- ya escrito y verificado, en pausa) pase a v2.
+CREATE TABLE IF NOT EXISTS tienda (
+    tienda    TEXT PRIMARY KEY,
+    tipo      TEXT NOT NULL CHECK (tipo IN ('online', 'fisica', 'ambas')),
+    ubicacion TEXT
+);
+
 CREATE TABLE IF NOT EXISTS producto (
     id            INTEGER PRIMARY KEY,
     pelicula_id   INTEGER NOT NULL REFERENCES pelicula(id),
