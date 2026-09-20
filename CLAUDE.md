@@ -91,6 +91,16 @@ falta un `iso_max` opcional en el esquema (migración, no borrar y recrear).
 
 ## Alcance de la v1
 
+**La v1 es un comparador de precios, no un optimizador de cesta.** Para
+cada película: la lista de tiendas que la venden, ordenada de más barata a
+más cara, con enlace directo a cada anuncio. Sin cesta, sin cálculo de
+envío, sin optimización automática — eso es v2. `cesta/optimizador.py` ya
+está escrito y verificado por fuerza bruta; se queda tal cual, en pausa,
+hasta que haya coste de envío real de varias tiendas que optimizar de
+verdad. Decidido el 20/09/2026, precisamente para que nadie —ni Pedro, ni
+un asistente, ni una sesión futura— vuelva a asumir que el objetivo es el
+optimizador.
+
 **Dentro:** carretes frescos, de marcas conocidas, en 35mm y 120.
 
 **Dentro también:** marcas propias de tienda y reenvasados (1hundred,
@@ -150,8 +160,14 @@ categorice junto a sus carretes.
    bloquea seguir avanzando con las demás.*
 3. **La segunda tienda**, que es cuando aparecen los problemas de
    emparejamiento de verdad. *Hecho cuando añadir la tercera cuesta una hora.*
-4. **El optimizador** de cesta con packs y umbrales.
-5. **La web de verdad**, construida encima del despliegue mínimo del paso 0.
+4. **La web de verdad: el comparador (v1).** Buscar una película, ver la
+   lista de tiendas que la venden ordenada de más barata a más cara, con
+   enlace directo a cada anuncio. Construida encima del despliegue mínimo
+   del paso 0, con los datos que ya hay (producto + anuncio + pelicula).
+5. **El optimizador de cesta con packs y umbrales (v2, en pausa).**
+   `cesta/optimizador.py` ya está escrito y verificado por fuerza bruta;
+   se retoma cuando haya coste de envío real de varias tiendas que
+   optimizar de verdad.
 6. **Frescura y avisos** cuando un adaptador se rompe.
 7. **Más tiendas.**
 
