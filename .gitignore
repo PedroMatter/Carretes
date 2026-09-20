@@ -16,3 +16,6 @@ carretes.db
 # Copias de seguridad que hace aplicar_migracion.py antes de tocar nada:
 # mismo motivo que carretes.db.
 respaldos/
+
+# Registro de la tarea programada de recolectar.py: solo local.
+logs/
