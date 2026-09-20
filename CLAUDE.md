@@ -93,14 +93,31 @@ falta un `iso_max` opcional en el esquema (migración, no borrar y recrear).
 
 **Dentro:** carretes frescos, de marcas conocidas, en 35mm y 120.
 
+**Dentro también:** marcas propias de tienda y reenvasados (1hundred,
+4hundred, 8hundred, CDX, Candido, las Eastman de La Peliculera). Si una
+tienda lo vende fresco, entra. De ellas guardamos lo que publica la tienda y
+nada más: nunca afirmamos qué emulsión llevan dentro, porque no lo sabemos.
+
 **Fuera:** película caducada, bobina a granel, instantánea (Instax, Polaroid),
-gran formato, cine (Super 8, 16mm), y marcas propias de tienda tipo 1Hundred o
-4Hundred de Revelab — no sabemos con certeza qué emulsión llevan y afirmarlo
-sería mentir.
+gran formato, cine (Super 8, 16mm).
 
 **Fuera también, de momento:** revelado y escaneo. Y las tiendas físicas: no
 publican precios, así que no hay dato que capturar. Si se mencionan, se dice
 claramente que no tenemos sus precios, en vez de fingir que sí.
+
+**Dos reglas para las marcas propias y los reenvasados:**
+
+- **Dos nombres se funden en un solo producto únicamente cuando lo dice el
+  fabricante.** Un parecido que hemos deducido nosotros no basta nunca.
+  Portra y Ektacolor Pro sí se funden, porque Eastman Kodak ha declarado que
+  es la misma película renombrada. CDX y CineStill XX no se funden, aunque
+  la ficha del CDX diga «250 Daylight / 200 Tungsteno», que son exactamente
+  las características de la Double-X y hace muy probable que sean el mismo
+  material: probable no es declarado.
+- **Cada marca propia es su propia película**, aunque sospechemos que dos
+  son el mismo material. No juntamos la 4hundred de una tienda con un
+  genérico 400 de otra. Si algún día se confirma que son lo mismo, se junta
+  entonces.
 
 ---
 
